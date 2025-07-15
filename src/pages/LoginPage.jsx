@@ -15,21 +15,36 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const res = await api.post("/admin/login", {
         email,
         password,
       });
 
-      const { token } = res.data;
-      localStorage.setItem("adminToken", token);
-      localStorage.setItem("isAdmin", "true");
+      const { token, role, user } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+      localStorage.setItem("user", JSON.stringify(user));
 
       toast.success("Login successful 🎉");
-      navigate("/dashboard");
+      console.log(
+        "Login success => navigating now to:",
+        role === "admin" ? "/dashboard/overview" : "/user/dashboard"
+      );
+
+      setTimeout(() => {
+        if (role === "admin") {
+          window.location.href = "/dashboard/overview"; // ✅ fallback if navigate fails
+        } else {
+          window.location.href = "/user/dashboard";
+        }
+      }, 200);
     } catch (err) {
       console.error(err);
-      const errorMsg = err.response?.data?.message || "Login failed. Please try again.";
+      const errorMsg =
+        err.response?.data?.message || "Login failed. Please try again.";
       toast.error(errorMsg);
     } finally {
       setLoading(false);
@@ -43,12 +58,16 @@ const LoginPage = () => {
           <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
             Troika Tech
           </h1>
-          <p className="text-gray-600 mt-2 text-sm">Chatbot Management Dashboard</p>
+          <p className="text-gray-600 mt-2 text-sm">
+            Chatbot Management Dashboard
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -60,7 +79,9 @@ const LoginPage = () => {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -121,7 +142,9 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-400">
-          &copy; {new Date().getFullYear()} <span className="text-gray-600 font-medium">Troika Tech</span>. All rights reserved.
+          &copy; {new Date().getFullYear()}{" "}
+          <span className="text-gray-600 font-medium">Troika Tech</span>. All
+          rights reserved.
         </div>
       </div>
     </div>

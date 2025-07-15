@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 const AddCompanyModal = ({ onClose, onSuccess }) => {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
+  const [email, setEmail] = useState(""); // ✅ use email
+  const [password, setPassword] = useState(""); // ✅ use password
   const [loading, setLoading] = useState(false);
 
   const handleAdd = async () => {
@@ -13,7 +15,7 @@ const AddCompanyModal = ({ onClose, onSuccess }) => {
       const token = localStorage.getItem("adminToken");
       await api.post(
         "/company/create",
-        { name, url },
+        { name, url, email, password }, // ✅ updated payload
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -35,56 +37,46 @@ const AddCompanyModal = ({ onClose, onSuccess }) => {
         <h2 className="text-xl font-bold mb-4 text-gray-800">Add Company</h2>
 
         <input
-          className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm"
           placeholder="Company Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <input
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm"
           placeholder="Domain"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
+        />
+
+        <input
+          type="email"
+          className="w-full mb-3 px-4 py-2 border border-gray-300 rounded-lg shadow-sm"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <div className="flex justify-end space-x-3">
           <button
             onClick={handleAdd}
             disabled={loading}
-            className={`px-5 py-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-semibold shadow-md transition-all ${
+            className={`px-5 py-2 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-lg font-semibold transition-all ${
               loading
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:from-blue-500 hover:to-teal-400"
             }`}
           >
-            {loading ? (
-              <div className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
-                Adding...
-              </div>
-            ) : (
-              "Add"
-            )}
+            {loading ? "Adding..." : "Add"}
           </button>
 
           <button

@@ -5,20 +5,21 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Get client config
+// ✅ Automatically attach token to all requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const fetchClientConfig = (chatbotId) => {
-  const token = localStorage.getItem("adminToken");
-  return api.get(`/chatbot/${chatbotId}/config`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  return api.get(`/chatbot/${chatbotId}/config`);
 };
 
-// Update client config
 export const updateClientConfig = (chatbotId, config) => {
-  const token = localStorage.getItem("adminToken");
-  return api.put(`/chatbot/${chatbotId}/config`, config, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  return api.put(`/chatbot/${chatbotId}/config`, config);
 };
 
 export default api;

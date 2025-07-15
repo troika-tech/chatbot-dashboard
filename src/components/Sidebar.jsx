@@ -6,14 +6,18 @@ import {
   UserPlus,
   LogOut,
 } from "lucide-react";
+import { toast } from "react-toastify";
 
 const Sidebar = () => {
   const navigate = useNavigate();
 
   const logout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("isAdmin");
+    localStorage.clear();
+    toast.success("Logged out successfully!");
     navigate("/");
+    setTimeout(() => {
+      window.location.reload();
+    }, 500); // slight delay so toast shows before reload
   };
 
   const navItemClass = ({ isActive }) =>

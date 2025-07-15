@@ -63,7 +63,7 @@ const ManageChatbotsPage = () => {
       const res = await api.get(`/chatbot/${id}/subscription`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSubscriptions((prev) => ({ ...prev, [id]: res.data.subscription }));
+      setSubscriptions((prev) => ({ ...prev, [id]: res.data }));
     } catch (err) {
       console.error("Failed to fetch subscription:", err);
     }
@@ -81,8 +81,8 @@ const ManageChatbotsPage = () => {
     const durationDays = planDetails?.duration_days || 30;
     const months = Math.ceil(durationDays / 30);
 
-    if (!selectedPlan) {
-      alert("Please select a plan.");
+    if (!selectedPlan || !planDetails) {
+      alert("Please select a valid plan.");
       return;
     }
 
@@ -121,7 +121,7 @@ const ManageChatbotsPage = () => {
     try {
       setIsDownloading(true);
       const token = localStorage.getItem("adminToken");
-      const response = await api.get(`/report/download/${chatbotId}`, {
+      const response = await api.get(`/chatbot/download/${chatbotId}`, {
         responseType: "blob",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -174,176 +174,199 @@ const ManageChatbotsPage = () => {
       <div className="space-y-8">
         {filtered.map((cb) => {
           const sub = subscriptions[cb._id];
-          const plan = sub?.plan_id;
+          const plan = sub?.plan_id || sub;
 
           return (
-          <div
-            key={cb._id}
-            className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-start mb-4">
-              <div className="space-y-1">
-                <h3 className="text-2xl font-semibold text-gray-800">
-                  {cb.name}
-                </h3>
-                <p className="text-sm text-gray-500">🏢 {cb.company_name}</p>
-                <p className="text-sm text-gray-500">🌐 {cb.company_url}</p>
-                <p className="text-xs text-gray-400">🆔 {cb._id}</p>
+            <div
+              key={cb._id}
+              className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-start mb-4">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-semibold text-gray-800">
+                    {cb.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">🏢 {cb.company_name}</p>
+                  <p className="text-sm text-gray-500">🌐 {cb.company_url}</p>
+                  <p className="text-xs text-gray-400">🆔 {cb._id}</p>
+                </div>
+                <UploadContextModal chatbotId={cb._id} />
               </div>
-              <UploadContextModal chatbotId={cb._id} />
-            </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <Stat
-                label="📊 Token Usage (Monthly)"
-                value={cb.used_tokens || 0}
-              />
-              <Stat label="💬 Total Messages" value={cb.total_messages || 0} />
-              <Stat label="👥 Unique Users" value={cb.unique_users || 0} />
-              <Stat
-                label="🔋 Remaining Tokens"
-                value={
-                  cb.token_limit != null && cb.used_tokens != null
-                    ? Math.max(cb.token_limit - cb.used_tokens, 0)
-                    : "Unlimited"
-                }
-              />
-              <div>
-                <p className="text-sm text-gray-500">📦 Total Token Limit</p>
-                {editingId === cb._id ? (
-                  <div className="flex items-center gap-2 mt-2">
-                    <input
-                      type="number"
-                      value={newLimit}
-                      onChange={(e) => setNewLimit(e.target.value)}
-                      className="w-24 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
-                    />
-                    <button
-                      onClick={() => updateTokenLimit(cb._id, newLimit)}
-                      className="text-green-600"
-                    >
-                      ✅
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingId(null);
-                        setNewLimit("");
-                      }}
-                      className="text-red-500"
-                    >
-                      ❌
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-lg font-semibold text-gray-800">
-                      {cb.token_limit || "Unlimited"}
-                    </span>
-                    <button
-                      onClick={() => {
-                        setEditingId(cb._id);
-                        setNewLimit(cb.token_limit || "");
-                      }}
-                      className="text-blue-500"
-                      title="Edit token limit"
-                    >
-                      ✏️
-                    </button>
-                  </div>
-                )}
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <Stat
+                  label="📊 Token Usage (Monthly)"
+                  value={cb.used_tokens || 0}
+                />
+                <Stat
+                  label="💬 Total Messages"
+                  value={cb.total_messages || 0}
+                />
+                <Stat label="👥 Unique Users" value={cb.unique_users || 0} />
+                <Stat
+                  label="🔋 Remaining Tokens"
+                  value={
+                    cb.token_limit != null && cb.used_tokens != null
+                      ? Math.max(cb.token_limit - cb.used_tokens, 0)
+                      : "Unlimited"
+                  }
+                />
+                <div>
+                  <p className="text-sm text-gray-500">📦 Total Token Limit</p>
+                  {editingId === cb._id ? (
+                    <div className="flex items-center gap-2 mt-2">
+                      <input
+                        type="number"
+                        value={newLimit}
+                        onChange={(e) => setNewLimit(e.target.value)}
+                        className="w-24 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300"
+                      />
+                      <button
+                        onClick={() => updateTokenLimit(cb._id, newLimit)}
+                        className="text-green-600"
+                      >
+                        ✅
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingId(null);
+                          setNewLimit("");
+                        }}
+                        className="text-red-500"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-lg font-semibold text-gray-800">
+                        {cb.token_limit || "Unlimited"}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setEditingId(cb._id);
+                          setNewLimit(cb.token_limit || "");
+                        }}
+                        className="text-blue-500"
+                        title="Edit token limit"
+                      >
+                        ✏️
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Plan Details */}
-            <div className="col-span-full">
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 w-full">
-                <p className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  📦 <span>Plan Details</span>
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <span className="text-pink-500">🏷️</span>
-                    <span>
-                      <strong>Name:</strong> {plan?.name || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-500">📅</span>
-                    <span>
-                      <strong>Duration:</strong> {plan?.duration_days || "N/A"}{" "}
-                      days
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-purple-500">👥</span>
-                    <span>
-                      <strong>Max Users:</strong> {plan?.max_users || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500">💰</span>
-                    <span>
-                      <strong>Price:</strong> ₹{plan?.price || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-600">⏳</span>
-                    <span>
-                      <strong>Expires:</strong>{" "}
-                      {sub?.end_date
-                        ? new Date(sub.end_date).toLocaleDateString()
-                        : "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-700">🙍‍♂️</span>
-                    <span>
-                      <strong>Users Used:</strong> {cb.unique_users} /{" "}
-                      {plan?.max_users || "N/A"}
-                    </span>
+              {/* Plan Details */}
+              <div className="col-span-full">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 w-full">
+                  <p className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    📦 <span>Plan Details</span>
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
+                    <div className="flex items-center gap-2">
+                      <span className="text-pink-500">🏷️</span>
+                      <span>
+                        <strong>Name:</strong> {plan?.name || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-500">📅</span>
+                      <span>
+                        <strong>Duration:</strong>{" "}
+                        {plan?.duration_days || "N/A"} days
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-purple-500">👥</span>
+                      <span>
+                        <strong>Max Users:</strong> {plan?.max_users || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-yellow-500">💰</span>
+                      <span>
+                        <strong>Price:</strong> ₹{plan?.price || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">⏳</span>
+                      <span>
+                        <strong>Expires:</strong>{" "}
+                        {sub?.end_date
+                          ? new Date(sub.end_date).toLocaleDateString()
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-700">🙍‍♂️</span>
+                      <span>
+                        <strong>Users Used:</strong> {cb.unique_users} /{" "}
+                        {plan?.max_users || "N/A"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Embed Script with Copy Button */}
+              <div className="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <p className="text-sm text-gray-600 mb-2">🔗 Embed Script:</p>
+                <div className="flex items-center justify-between gap-3">
+                  <code className="text-xs bg-gray-100 p-2 rounded break-all w-full">
+                    {`<script src="https://api.0804.in/chatbot-loader/loader.js" chatbot-id="${cb._id}"></script>`}
+                  </code>
+                  <button
+                    onClick={() => {
+                      const script = `<script src="https://api.0804.in/chatbot-loader/loader.js" chatbot-id="${cb._id}"></script>`;
+                      navigator.clipboard.writeText(script);
+                      alert("✅ Embed script copied!");
+                    }}
+                    className="bg-gray-800 text-white px-3 py-1 rounded text-sm hover:bg-gray-900"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex flex-wrap gap-3 justify-end">
+                <ActionButton
+                  color="blue"
+                  onClick={() => {
+                    setSelected(cb);
+                    setShowModal(MODAL_TYPES.MESSAGE_HISTORY);
+                  }}
+                >
+                  🧾 Message History
+                </ActionButton>
+
+                <ActionButton
+                  color="indigo"
+                  onClick={() => handleDownloadReport(cb._id)}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? "⏳ Downloading..." : "📄 Download Report"}
+                </ActionButton>
+
+                <ActionButton color="green" onClick={() => setRenewing(cb._id)}>
+                  ♻️ Renew Plan
+                </ActionButton>
+
+                <ActionButton
+                  color="yellow"
+                  onClick={() => {
+                    setSelected(cb);
+                    setShowModal(MODAL_TYPES.CONFIG);
+                  }}
+                >
+                  ⚙️ Edit Config
+                </ActionButton>
+              </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="mt-6 flex flex-wrap gap-3 justify-end">
-              <ActionButton
-                color="blue"
-                onClick={() => {
-                  setSelected(cb);
-                  setShowModal(MODAL_TYPES.MESSAGE_HISTORY);
-                }}
-              >
-                🧾 Message History
-              </ActionButton>
-
-              <ActionButton
-                color="indigo"
-                onClick={() => handleDownloadReport(cb._id)}
-                disabled={isDownloading}
-              >
-                {isDownloading ? "⏳ Downloading..." : "📄 Download Report"}
-              </ActionButton>
-
-              <ActionButton color="green" onClick={() => setRenewing(cb._id)}>
-                ♻️ Renew Plan
-              </ActionButton>
-
-              <ActionButton
-                color="yellow"
-                onClick={() => {
-                  setSelected(cb);
-                  setShowModal(MODAL_TYPES.CONFIG);
-                }}
-              >
-                ⚙️ Edit Config
-              </ActionButton>
-            </div>
-          </div>
-          )
+          );
         })}
       </div>
 

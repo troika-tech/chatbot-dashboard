@@ -44,6 +44,11 @@ const AddAdminPage = () => {
       return;
     }
 
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
     try {
       setLoading(true);
       const token = localStorage.getItem("adminToken");
@@ -78,7 +83,9 @@ const AddAdminPage = () => {
     <div className="min-h-screen bg-gray-100 text-gray-800 px-4 py-8 flex flex-col items-center">
       {/* Form Card */}
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
-        <h2 className="text-2xl font-bold text-center mb-6">➕ Add New Admin</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">
+          ➕ Add New Admin
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
           <input
@@ -140,7 +147,9 @@ const AddAdminPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2.5 rounded-lg font-semibold transition-all shadow hover:shadow-lg ${
-              loading ? "opacity-60 cursor-not-allowed" : "hover:from-blue-500 hover:to-teal-400"
+              loading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:from-blue-500 hover:to-teal-400"
             }`}
           >
             {loading ? (
@@ -190,7 +199,7 @@ const AddAdminPage = () => {
               {adminList.length > 0 ? (
                 adminList.map((admin) => (
                   <tr
-                    key={admin.id}
+                    key={admin._id}
                     className="border-t border-gray-100 hover:bg-gray-50"
                   >
                     <td className="p-3">{admin.name}</td>
