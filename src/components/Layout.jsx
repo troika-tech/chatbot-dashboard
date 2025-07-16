@@ -1,13 +1,16 @@
-// components/Layout.jsx
+// src/components/Layout.jsx
+import React from "react";
 import Header from "./Header";
+import Sidebar from "./UserSidebar";
 
-const Layout = ({ children }) => {
+export default function Layout({ children }) {
   return (
-    <div>
-      <Header />
-      <main className="p-6 bg-gray-100 min-h-screen">{children}</main>
+    <div className="flex">
+      <Sidebar />
+      <div className="flex flex-col flex-1 min-h-screen">
+        <Header />
+        <main className="p-6">{children}</main>
+      </div>
     </div>
   );
-};
-
-export default Layout;
+}

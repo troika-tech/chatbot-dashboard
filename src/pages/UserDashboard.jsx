@@ -2,6 +2,25 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 import SessionModal from "../components/SessionModal";
+import Layout from "../components/Layout";
+import {
+  Mail,
+  Globe,
+  Crown,
+  Calendar,
+  Clock3,
+  BarChart3,
+  MessageSquare,
+  Users,
+  Briefcase,
+  UserCircle,
+  Bot,
+  SquareUserRound,
+  CircleUser,
+} from "lucide-react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 const UserDashboard = () => {
   const [company, setCompany] = useState(null);
@@ -199,48 +218,112 @@ const UserDashboard = () => {
       </div>
     );
 
+  const userLimit = plan?.max_users || 200;
+  const userPercentage = Math.round((usage.unique_users / userLimit) * 100);
+
   return (
-      <div className="max-w-6xl mx-auto p-6 sm:p-10 space-y-10 font-[Inter,sans-serif]">
+    <Layout>
+      <div className="max-w-6xl ml-64 mx-auto p-6 sm:p-10 space-y-10 font-[Inter,sans-serif]">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-3xl font-bold text-gray-900">
-            📊 User Dashboard
-          </h1>
+        {/* <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          
+          <div className="flex items-center gap-4">
+            <img
+              src={logo} // replace with your actual logo path
+              alt="Company Logo"
+              className="h-20 w-auto"
+            />
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500">
+              User Dashboard
+            </h1>
+          </div>
+
+          
           <div className="flex flex-wrap gap-4">
             <button
               onClick={handleDownload}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg shadow transition-all duration-200"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-5 py-2 rounded-lg shadow transition-all duration-200"
             >
               📄 Download Report
             </button>
+
             <button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg shadow transition-all duration-200"
+              className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-5 py-2 rounded-lg shadow transition-all duration-200"
             >
               🔒 Logout
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white shadow-xl rounded-2xl p-6 border-t-4 border-blue-500">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">
-              🏢 Company Details
-            </h2>
-            <p>
-              <strong>Name:</strong> {company.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {company.email}
-            </p>
-            <p>
-              <strong>Domain:</strong> {company.url}
-            </p>
+          {/* <div className="bg-white rounded-2xl p-6 border-t-4 border-blue-500 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)] hover:scale-[1.01] transform transition-all duration-300">
+                <h2 className="text-lg font-semibold text-gray-700 mb-3">
+                  🏢 Company Details
+                </h2>
+                <p>
+                  <strong>Name:</strong> {company.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {company.email}
+                </p>
+                <p>
+                  <strong>Domain:</strong> {company.url}
+                </p>
+              </div> */}
+
+          <div className="bg-white border-blue-100 bg-gradient-to-br from-blue-50/50 to-white rounded-xl p-6 shadow-sm hover:shadow-md hover:scale-[1.02] transition duration-300">
+            {/* Header */}
+            <h3 className="flex items-center gap-2 text-lg font-bold text-blue-600 mb-8">
+              <span className="bg-blue-600 text-white p-1.5 rounded-md">
+                <SquareUserRound size={16} />
+              </span>
+              User Details
+            </h3>
+
+            {/* Company Name */}
+            <div className="flex items-start gap-3 mb-6">
+              <span className="bg-blue-100 text-blue-700 p-1.5 rounded-md">
+                <CircleUser size={16} />
+              </span>
+              <div>
+                <div className="text-sm text-gray-500">User Name</div>
+                <div className="font-semibold text-sm text-black">
+                  {company.name}
+                </div>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="flex items-start gap-3 mb-6">
+              <span className="bg-blue-100 text-blue-700 p-1.5 rounded-md">
+                <Mail size={16} />
+              </span>
+              <div>
+                <div className="text-sm text-gray-500">Email</div>
+                <div className="font-semibold text-sm text-black">
+                  {company.email}
+                </div>
+              </div>
+            </div>
+
+            {/* Domain */}
+            <div className="flex items-start gap-3">
+              <span className="bg-blue-100 text-blue-700 p-1.5 rounded-md">
+                <Globe size={16} />
+              </span>
+              <div>
+                <div className="text-sm text-gray-500">Domain</div>
+                <div className="font-semibold text-sm text-black">
+                  {company.url}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {plan ? (
-            <div className="bg-white shadow-xl rounded-2xl p-6 border-t-4 border-indigo-500">
+          {/* {plan ? (
+            <div className="bg-white shadow-2xl hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-shadow duration-300 rounded-2xl p-6 border-t-4 border-indigo-500 hover:scale-[1.02] transform transition-transform">
               <h2 className="text-lg font-semibold text-gray-700 mb-3">
                 📦 Plan Details
               </h2>
@@ -275,9 +358,81 @@ const UserDashboard = () => {
             <div className="bg-white shadow-xl rounded-2xl p-6 border-t-4 border-indigo-500 text-gray-500 italic">
               No active plan found.
             </div>
+          )} */}
+
+          {plan ? (
+            <div className="bg-white border-amber-100 bg-gradient-to-br from-amber-50/50 via-green-50/30 to-white rounded-xl p-6 shadow-sm hover:shadow-md hover:scale-[1.02] transition duration-300">
+              {/* Header */}
+              <h3 className="flex items-center gap-2 text-lg font-bold text-orange-600 mb-5">
+                <span className="bg-green-600 text-white p-1.5 rounded-md">
+                  <Crown size={16} />
+                </span>
+                Plan Details
+              </h3>
+
+              {/* Fields */}
+              <div className="space-y-4 text-sm">
+                <div className="flex items-start gap-3">
+                  <span className="bg-yellow-100 text-yellow-600 p-1.5 rounded-md">
+                    <Crown size={16} />
+                  </span>
+                  <div>
+                    <div className="text-gray-500">Plan</div>
+                    <div className="font-semibold">{plan.name}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-100 text-green-600 p-1.5 rounded-md">
+                    <Calendar size={16} />
+                  </span>
+                  <div>
+                    <div className="text-gray-500">Validity</div>
+                    <div className="font-semibold">
+                      {plan.duration_days} Days
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <span className="bg-orange-100 text-orange-600 p-1.5 rounded-md">
+                    <Clock3 size={16} />
+                  </span>
+                  <div>
+                    <div className="text-gray-500">Remaining</div>
+                    <div className="font-semibold">
+                      {plan.days_remaining} days left
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress */}
+              <div className="mt-4">
+                <div className="w-full h-2 bg-gray-200 rounded-full">
+                  <div
+                    className="h-2 bg-blue-600 rounded-full"
+                    style={{
+                      width: `${
+                        (plan.days_remaining / plan.duration_days) * 100
+                      }%`,
+                      transition: "width 0.5s ease-in-out",
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-600 mt-1">
+                  {plan.duration_days - plan.days_remaining} of{" "}
+                  {plan.duration_days} days used
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white border border-yellow-200 text-center italic text-gray-500 rounded-xl p-6 shadow-sm">
+              No active plan found.
+            </div>
           )}
 
-          <div className="bg-white shadow-xl rounded-2xl p-6 border-t-4 border-green-500">
+          {/* <div className="bg-white shadow-2xl hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-shadow duration-300 rounded-2xl p-6 border-t-4 border-green-500 hover:scale-[1.02] transform transition-transform">
             <h2 className="text-lg font-semibold text-gray-700 mb-3">
               📈 Usage
             </h2>
@@ -287,17 +442,56 @@ const UserDashboard = () => {
             <p>
               <strong>Users:</strong> {usage.unique_users} / {plan.max_users}
             </p>
+          </div> */}
+
+          <div className="bg-white hover:scale-[1.02] border-purple-100 bg-gradient-to-br from-purple-50/50 to-white rounded-xl p-6 shadow-sm hover:shadow-md transition duration-300">
+            {/* Header */}
+            <h3 className="flex items-center gap-2 text-lg font-bold text-purple-600 mb-5">
+              <span className="bg-purple-600 text-white p-1.5 rounded-md">
+                <BarChart3 size={16} />
+              </span>
+              Usage Statistics
+            </h3>
+
+            {/* Messages Sent */}
+            <div className="flex items-start gap-3 mb-5">
+              <span className="bg-purple-100 text-purple-600 p-1.5 rounded-md">
+                <MessageSquare size={16} />
+              </span>
+              <div className="flex-1">
+                <div className="text-sm text-gray-500 mb-1">Messages Sent</div>
+                <div className="font-bold text-black mb-1">
+                  {usage.total_messages}
+                </div>
+              </div>
+            </div>
+
+            {/* Total Users */}
+            <div className="flex items-start gap-3">
+              <span className="bg-purple-100 text-purple-600 p-1.5 rounded-md">
+                <Users size={16} />
+              </span>
+              <div className="flex-1">
+                <div className="text-sm text-gray-500 mb-1">Total Users</div>
+                <div className="font-bold text-black mb-1">
+                  {usage.unique_users} / {userLimit}
+                </div>
+                <p className="text-xs text-gray-500">
+                  {userPercentage}% of user limit reached
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Message History */}
-        <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 overflow-auto">
+        {/* <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 overflow-auto">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-700">
               💬 Message History
             </h2>
             <div className="flex gap-4 items-center">
-              {/* Toggle view mode */}
+      
               <select
                 value={viewMode}
                 onChange={(e) => {
@@ -310,7 +504,7 @@ const UserDashboard = () => {
                 <option value="email">📧 Group by Email</option>
               </select>
 
-              {/* Dynamic filter dropdown based on view mode */}
+             
               <select
                 className="px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring focus:border-blue-300 text-sm"
                 value={sessionFilter}
@@ -394,7 +588,7 @@ const UserDashboard = () => {
             </tbody>
           </table>
 
-          {/* Pagination */}
+          
 
           <div className="flex flex-wrap justify-center items-center gap-4 mt-6">
             <button
@@ -417,6 +611,56 @@ const UserDashboard = () => {
               Next →
             </button>
           </div>
+        </div> */}
+
+        <div className="bg-white border border-fuchsia-200 rounded-xl p-6 shadow-sm hover:shadow-md transition duration-300">
+          <h3 className="flex items-center gap-2 text-lg font-bold text-fuchsia-700 mb-6">
+            <span className="bg-fuchsia-700 text-white p-1.5 rounded-md">
+              <Briefcase size={16} />
+            </span>
+            Recent Message History
+          </h3>
+
+          {messages?.slice(0, 6).map((msg, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-gray-200 rounded-lg p-4 mb-4"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center text-white ${
+                    msg.sender === "user" ? "bg-pink-600" : "bg-violet-600"
+                  }`}
+                >
+                  {msg.sender === "user" ? (
+                    <UserCircle size={16} />
+                  ) : (
+                    <Bot size={16} />
+                  )}
+                </div>
+                <span
+                  className={`text-xs font-medium ${
+                    msg.sender === "user"
+                      ? "bg-pink-100 text-pink-600"
+                      : "bg-violet-100 text-violet-600"
+                  } px-2 py-0.5 rounded-md`}
+                >
+                  {msg.sender === "user" ? "User" : "Bot"}
+                </span>
+                {msg.sender === "user" && (
+                  <span className="text-sm text-gray-700 font-medium">
+                    {msg.email}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-sm text-gray-900">{msg.content}</p>
+
+              <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                <span>{dayjs(msg.timestamp).fromNow()}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         <SessionModal
@@ -428,6 +672,7 @@ const UserDashboard = () => {
           }}
         />
       </div>
+    </Layout>
   );
 };
 

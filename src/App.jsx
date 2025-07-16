@@ -8,6 +8,7 @@ import AddAdminPage from "./pages/AddAdminPage";
 import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import MessageHistoryPage from "./pages/MessageHistoryPage";
 import "./App.css";
 
 function App() {
@@ -39,6 +40,15 @@ function App() {
           element={
             <ProtectedRoute role="user">
               <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user/message-history"
+          element={
+            <ProtectedRoute role="user">
+              <MessageHistoryPage />
             </ProtectedRoute>
           }
         />
