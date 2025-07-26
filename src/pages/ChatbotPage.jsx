@@ -4,6 +4,7 @@ import MessageHistory from "../components/MessageHistory";
 import ClipLoader from "react-spinners/ClipLoader";
 import UploadContextModal from "../components/UploadContextModal";
 import EditClientConfigModal from "../components/EditClientConfigModal";
+import { toast } from "react-toastify";
 
 const MODAL_TYPES = {
   NONE: null,
@@ -82,7 +83,7 @@ const ManageChatbotsPage = () => {
     const months = Math.ceil(durationDays / 30);
 
     if (!selectedPlan || !planDetails) {
-      alert("Please select a valid plan.");
+      toast.error("Please select a valid plan.");
       return;
     }
 
@@ -92,12 +93,12 @@ const ManageChatbotsPage = () => {
         { plan_id: selectedPlan, months },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("✅ Plan renewed successfully");
+      toast.success("✅ Plan renewed successfully");
       fetchSubscription(id);
       setRenewing(null);
     } catch (err) {
       console.error("Renewal error:", err);
-      alert("❌ Renewal failed");
+      toast.error("❌ Renewal failed");
     }
   };
 
@@ -135,7 +136,7 @@ const ManageChatbotsPage = () => {
       link.remove();
     } catch (err) {
       console.error("Failed to download report:", err);
-      alert("❌ Failed to download report. Try again.");
+      toast.error("❌ Failed to download report. Try again.");
     } finally {
       setIsDownloading(false);
     }
@@ -316,13 +317,13 @@ const ManageChatbotsPage = () => {
                 <p className="text-sm text-gray-600 mb-2">🔗 Embed Script:</p>
                 <div className="flex items-center justify-between gap-3">
                   <code className="text-xs bg-gray-100 p-2 rounded break-all w-full">
-                    {`<script src="https://api.0804.in/chatbot-loader/loader.js" chatbot-id="${cb._id}"></script>`}
+                    {`<script src="https://api.0804.in/chatbot-loader/loaders.js" chatbot-id="${cb._id}" defer></script>`}
                   </code>
                   <button
                     onClick={() => {
-                      const script = `<script src="https://api.0804.in/chatbot-loader/loader.js" chatbot-id="${cb._id}"></script>`;
+                      const script = `<script src="https://api.0804.in/chatbot-loader/loaders.js" chatbot-id="${cb._id}" defer></script>`;
                       navigator.clipboard.writeText(script);
-                      alert("✅ Embed script copied!");
+                      toast.success("✅ Embed script copied!");
                     }}
                     className="bg-gray-800 text-white px-3 py-1 rounded text-sm hover:bg-gray-900"
                   >
